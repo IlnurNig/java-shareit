@@ -17,7 +17,7 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JoinColumn(name = "comment_id")
-    private Long comment_id;
+    private Long commentId;
 
     private String text;
 

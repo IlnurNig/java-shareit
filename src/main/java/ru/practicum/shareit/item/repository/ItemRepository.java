@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    Collection<Item> findAllByUserId(long user_id);
+    Collection<Item> findAllByUserId(long userId);
 
     @Query(" select i from Item i " +
             "where i.available=true  and " +

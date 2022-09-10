@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 public class CommentMapper {
     public static CommentDto toDto(Comment comment) {
         return CommentDto.builder()
-                .id(comment.getComment_id())
+                .id(comment.getCommentId())
                 .authorName(comment.getAuthor().getName())
                 .text(comment.getText())
                 .build();
@@ -24,7 +24,7 @@ public class CommentMapper {
                                    Item item,
                                    User author) {
         return Comment.builder()
-                .comment_id(commentDto.getId())
+                .commentId(commentDto.getId())
                 .text(commentDto.getText())
                 .author(author)
                 .item(item)

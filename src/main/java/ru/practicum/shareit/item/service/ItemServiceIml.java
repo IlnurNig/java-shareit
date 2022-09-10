@@ -74,7 +74,7 @@ public class ItemServiceIml implements ItemService {
     public ItemDto getItemDtoById(long itemId, long userId) throws ExceptionNotFound {
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new UnknownItemException(String.format("The item with id=%d does not exist", itemId)));
-        if (item.getUser().getId() == userId){
+        if (item.getUser().getId() == userId) {
             addLastAndNextBooking(item);
             return ItemMapper.toDtoOwner(item);
         }
@@ -132,7 +132,7 @@ public class ItemServiceIml implements ItemService {
                         () -> new ValidationException(
                                 String.format("Add comment to item id=%d without booking failed", item.getItemId()))
                 );
-        if (!StringUtils.hasText(commentDto.getText())){
+        if (!StringUtils.hasText(commentDto.getText())) {
             throw new ValidationException("Add empty comment failed");
         }
     }
@@ -159,7 +159,7 @@ public class ItemServiceIml implements ItemService {
         }
     }
 
-    private static Item addLastAndNextBooking(Item item){
+    private static Item addLastAndNextBooking(Item item) {
         item.setLastBooking(item.getBookings().stream()
                 .sorted(Comparator.comparing(Booking::getEnd).reversed())
                 .filter(booking -> LocalDateTime.now().isAfter(booking.getEnd()))
