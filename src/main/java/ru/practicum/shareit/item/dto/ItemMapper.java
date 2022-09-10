@@ -1,25 +1,40 @@
 package ru.practicum.shareit.item.dto;
 
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.booking.dto.BookingMapper;
+import ru.practicum.shareit.item.comment.CommentMapper;
 import ru.practicum.shareit.item.model.Item;
 
 @Component
 public class ItemMapper {
-    public Item toEntity(ItemDto dto) {
-        return Item.builder()
-                .itemId(dto.getId())
-                .name(dto.getName())
-                .description(dto.getDescription())
-                .available(dto.getAvailable())
-                .build();
+    public static Item toEntity(ItemDto dto) {
+        Item item = new Item();
+        item.setItemId(dto.getId());
+        item.setDescription(dto.getDescription());
+        item.setName(dto.getName());
+        item.setAvailable(dto.getAvailable());
+        return item;
     }
 
-    public ItemDto toDto(Item item) {
+    public static ItemDto toDto(Item item) {
         return ItemDto.builder()
                 .id(item.getItemId())
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
+                .comments(CommentMapper.toDto(item.getComments()))
                 .build();
+    }
+
+    public static ItemDto toDtoOwner(Item item) {
+        ItemDto itemDto = toDto(item);
+        if (item.getLastBooking() != null) {
+            itemDto.setLastBooking(BookingMapper.toDto(item.getLastBooking()));
+        }
+        if (item.getNextBooking() != null) {
+            itemDto.setNextBooking(BookingMapper.toDto(item.getNextBooking()));
+            BookingMapper.toDto(item.getNextBooking());
+        }
+        return itemDto;
     }
 }

@@ -8,7 +8,6 @@ import ru.practicum.shareit.exception.iml.ConflictUserException;
 import ru.practicum.shareit.exception.iml.UnknownUserException;
 import ru.practicum.shareit.exception.iml.ValidationException;
 import ru.practicum.shareit.exception.abstractClass.ExceptionBadRequest;
-import ru.practicum.shareit.exception.abstractClass.ExceptionConflict;
 import ru.practicum.shareit.exception.abstractClass.ExceptionNotFound;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
@@ -22,20 +21,17 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserServiceIml implements UserService {
     private final UserRepository repository;
-    private final UserMapper mapper;
 
     @Autowired
     public UserServiceIml(UserRepository repository, UserMapper mapper) {
         this.repository = repository;
-        this.mapper = mapper;
     }
 
     @Override
-    public UserDto createUser(UserDto userDto) throws ExceptionNotFound, ExceptionConflict, ExceptionBadRequest {
+    public UserDto createUser(UserDto userDto) throws ExceptionNotFound, ExceptionBadRequest {
         validateCreateUser(userDto);
-        validateDuplicateEmail(userDto.getEmail());
-        User user = repository.createUser(mapper.toEntity(userDto));
-        return mapper.toDto(user);
+        User user = repository.save(UserMapper.toEntity(userDto));
+        return UserMapper.toDto(user);
     }
 
     @Override
@@ -49,31 +45,31 @@ public class UserServiceIml implements UserService {
         if (!(userDto.getName() == null)) {
             user.setName(userDto.getName());
         }
-        return mapper.toDto(repository.updateUser(user));
+        return UserMapper.toDto(repository.save(user));
     }
 
     @Override
     public void deleteUser(long userId) {
-        repository.deleteUser(userId);
+        repository.deleteById(userId);
     }
 
     @Override
     public UserDto getUserDtoById(long userId) throws ExceptionNotFound {
-        return mapper.toDto(getUserById(userId));
+        return UserMapper.toDto(getUserById(userId));
     }
 
     @Override
     public Collection<UserDto> getAllUserDto() {
-        return repository.getAllUser().stream().map(mapper::toDto).collect(Collectors.toList());
+        return repository.findAll().stream().map(UserMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
     public boolean containsId(long userId) {
-        return repository.containsId(userId);
+        return repository.findById(userId).isPresent();
     }
 
-    private User getUserById(long userId) throws ExceptionNotFound {
-        return repository.getUserById(userId).orElseThrow(() ->
+    public User getUserById(long userId) throws ExceptionNotFound {
+        return repository.findById(userId).orElseThrow(() ->
                 new UnknownUserException(String.format("The user with id=%d does not exist", userId)));
     }
 
@@ -94,7 +90,7 @@ public class UserServiceIml implements UserService {
     }
 
     private void validateDuplicateEmail(String email) throws ConflictUserException {
-        if (repository.containsEmail(email))
+        if (repository.findByEmailIgnoreCase(email).isPresent())
             throw new ConflictUserException(String.format("User with mail=%s already exists", email));
     }
 

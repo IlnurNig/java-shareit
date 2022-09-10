@@ -5,9 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.abstractClass.ExceptionBadRequest;
 import ru.practicum.shareit.exception.abstractClass.ExceptionNotFound;
+import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 
 /**
@@ -42,9 +45,10 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemDtoById(@PathVariable long itemId) throws ExceptionNotFound {
+    public ItemDto getItemDtoById(@PathVariable long itemId,
+                                  @RequestHeader("X-Sharer-User-Id") @NotNull long userId) throws ExceptionNotFound {
         log.info("GET /items/{}", itemId);
-        return itemService.getItemDtoById(itemId);
+        return itemService.getItemDtoById(itemId, userId);
     }
 
     @GetMapping
@@ -57,7 +61,15 @@ public class ItemController {
     public Collection<ItemDto> searchItemDtoByIdUserAndByText(@RequestHeader("X-Sharer-User-Id") long userId,
                                                               @RequestParam(value = "text") String text) {
         log.info("GET /items/search X-Sharer-User-Id:{}, text:{}", userId, text);
-        return itemService.searchItemDtoByIdUserAndByText(userId, text);
+        return itemService.searchItemDtoByText(text);
+    }
+
+    @PostMapping("{itemId}/comment")
+    public CommentDto createComment(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
+                                    @Valid @RequestBody CommentDto commentDto,
+                                    @PathVariable @NotNull Long itemId)
+            throws ExceptionNotFound, ExceptionBadRequest {
+        return itemService.createComment(userId, commentDto, itemId);
     }
 
 }

@@ -5,6 +5,7 @@ import ru.practicum.shareit.exception.abstractClass.ExceptionConflict;
 import ru.practicum.shareit.exception.abstractClass.ExceptionNotFound;
 import ru.practicum.shareit.exception.iml.ConflictUserException;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
 
@@ -20,5 +21,7 @@ public interface UserService {
     Collection<UserDto> getAllUserDto();
 
     boolean containsId(long userId);
+
+    User getUserById(long userId) throws ExceptionNotFound;
 
 }
