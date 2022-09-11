@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.exception.abstractClass.ExceptionBadRequest;
 import ru.practicum.shareit.exception.abstractClass.ExceptionConflict;
 import ru.practicum.shareit.exception.abstractClass.ExceptionNotFound;
+import ru.practicum.shareit.exception.iml.ExceptionInteralServerError;
 import ru.practicum.shareit.exception.model.ErrorResponse;
 
 @RestControllerAdvice
@@ -31,6 +32,13 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse exceptionNotFound(final ExceptionNotFound e) {
+        log.error(e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse exceptionInternalServerError(final ExceptionInteralServerError e) {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
