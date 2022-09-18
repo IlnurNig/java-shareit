@@ -29,7 +29,8 @@ public class ItemServiceTest {
     @Test
     void itemServiceTest() throws ExceptionBadRequest, ExceptionNotFound, ExceptionConflict {
 
-        userService.createUser(UserDto.builder().name("test").email("test@maeil").build());
+        UserDto userDto = userService.createUser(UserDto.builder().name("userService1").email("userService1@mail").build());
+        UserDto userDto2 = userService.createUser(UserDto.builder().name("userService2").email("userService2@mail").build());
 
         ItemDto itemDto = ItemDto.builder()
                 .name("item1")
@@ -38,12 +39,12 @@ public class ItemServiceTest {
                 .build();
 
 
-        ItemDto itemDtoNew = itemService.createItem(itemDto, 1);
+        ItemDto itemDtoNew = itemService.createItem(itemDto, userDto.getId());
         assertEquals(itemDto.getAvailable(), itemDtoNew.getAvailable());
         assertEquals(itemDto.getName(), itemDtoNew.getName());
         assertEquals(itemDto.getDescription(), itemDtoNew.getDescription());
 
-        itemDto = itemService.getItemDtoById(1, 2);
+        itemDto = itemService.getItemDtoById(1, userDto2.getId());
         assertEquals(itemDto.getAvailable(), itemDtoNew.getAvailable());
         assertEquals(itemDto.getName(), itemDtoNew.getName());
         assertEquals(itemDto.getDescription(), itemDtoNew.getDescription());
