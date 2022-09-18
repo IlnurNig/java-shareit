@@ -9,11 +9,13 @@ import ru.practicum.shareit.booking.dto.BookingOutputDto;
 import ru.practicum.shareit.booking.model.status.Status;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.abstractClass.ExceptionBadRequest;
+import ru.practicum.shareit.exception.abstractClass.ExceptionConflict;
 import ru.practicum.shareit.exception.abstractClass.ExceptionNotFound;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
 import ru.practicum.shareit.requests.service.RequestService;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
@@ -33,8 +35,13 @@ public class RequestServiceTest {
     ItemService itemService;
 
     @Test
-    void requestServiceTest() throws ExceptionBadRequest, ExceptionNotFound {
-        itemService.createItem(ItemDto.builder().name("item1").description("desc1").available(true).build(), 1);
+    void requestServiceTest() throws ExceptionBadRequest, ExceptionNotFound, ExceptionConflict {
+        UserDto userDto = userService.createUser
+                (UserDto.builder().name("requestServiceTest1").email("requestServiceTest1@mail").build());
+        UserDto userDto2 = userService.createUser
+                (UserDto.builder().name("requestServiceTest2").email("requestServiceTest2@mail").build());
+        itemService.createItem(ItemDto.builder().name("item1").description("desc1").available(true).build(),
+                userDto.getId());
 
         BookingDto bookingDto = BookingDto.builder()
                 .bookerId(2L)
@@ -43,14 +50,15 @@ public class RequestServiceTest {
                 .status(Status.WAITING.getCode())
                 .itemId(1L)
                 .build();
-        BookingOutputDto bookingDtoNew = bookingService.createBookingDto(bookingDto, 2);
+        BookingOutputDto bookingDtoNew = bookingService.createBookingDto(bookingDto, userDto2.getId());
+        assertEquals(bookingDto.getStart(), bookingDtoNew.getStartTime());
 
         ItemRequestDto itemRequestDto = ItemRequestDto.builder()
                 .description("test")
                 .created(LocalDateTime.now())
                 .build();
 
-        ItemRequestDto itemRequestDtoNew = requestService.createRequest(1L, itemRequestDto);
+        ItemRequestDto itemRequestDtoNew = requestService.createRequest(userDto.getId(), itemRequestDto);
         assertEquals(itemRequestDto.getDescription(), itemRequestDtoNew.getDescription());
         assertEquals(itemRequestDto.getCreated(), itemRequestDtoNew.getCreated());
 
