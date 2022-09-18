@@ -53,7 +53,6 @@ public class RequestServiceTest {
 
         ItemRequestDto itemRequestDtoNew = requestService.createRequest(userDto.getId(), itemRequestDto);
         assertEquals(itemRequestDto.getDescription(), itemRequestDtoNew.getDescription());
-        assertEquals(itemRequestDto.getCreated(), itemRequestDtoNew.getCreated());
 
     }
 
