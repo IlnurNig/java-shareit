@@ -9,7 +9,6 @@ import ru.practicum.shareit.booking.dto.BookingOutputDto;
 import ru.practicum.shareit.booking.model.status.Status;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.abstractClass.ExceptionBadRequest;
-import ru.practicum.shareit.exception.abstractClass.ExceptionConflict;
 import ru.practicum.shareit.exception.abstractClass.ExceptionNotFound;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
