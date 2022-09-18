@@ -23,7 +23,7 @@ public class UserServiceIml implements UserService {
     private final UserRepository repository;
 
     @Autowired
-    public UserServiceIml(UserRepository repository, UserMapper mapper) {
+    public UserServiceIml(UserRepository repository) {
         this.repository = repository;
     }
 

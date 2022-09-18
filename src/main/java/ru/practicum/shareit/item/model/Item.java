@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.context.annotation.Lazy;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.comment.Comment;
+import ru.practicum.shareit.requests.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -36,7 +37,7 @@ public class Item {
 
     private Boolean available;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "item")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE, mappedBy = "item")
     @ToString.Exclude
     private Set<Booking> bookings;
 
@@ -48,8 +49,12 @@ public class Item {
     @Lazy
     private Booking nextBooking;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "item")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE, mappedBy = "item")
     @ToString.Exclude
     private Set<Comment> comments;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "request_id", nullable = false)
+    @ToString.Exclude
+    private ItemRequest itemRequest;
 }

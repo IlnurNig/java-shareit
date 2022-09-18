@@ -2,13 +2,16 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingOutputDto;
 import ru.practicum.shareit.booking.dto.State;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.repository.BookingRepository;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.model.status.Status;
 import ru.practicum.shareit.exception.abstractClass.ExceptionBadRequest;
 import ru.practicum.shareit.exception.abstractClass.ExceptionNotFound;
@@ -21,6 +24,7 @@ import ru.practicum.shareit.user.service.UserService;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,8 +83,9 @@ public class BookingService {
         return BookingMapper.toDto(booking);
     }
 
-    public Collection<BookingOutputDto> getAllBookingByUserIdAndState(Long userId, String state)
-            throws ExceptionInteralServerError {
+    public Collection<BookingOutputDto> getAllBookingByUserIdAndState(Long userId, String state, Integer from,
+                                                                      Integer size)
+            throws ExceptionInteralServerError, ExceptionBadRequest {
 
         State st = getState(state);
 
@@ -88,16 +93,22 @@ public class BookingService {
             throw new ExceptionInteralServerError("wrong user");
         }
 
-        List<Booking> bookings = bookingRepository.findBookingByBookerIdOrderByStartDesc(userId);
+        validateFromAndSize(from, size);
+        Pageable pageable = PageRequest.of(
+                Objects.requireNonNullElse(from, 0) / Objects.requireNonNullElse(size, 50),
+                Objects.requireNonNullElse(size, 50),
+                Sort.by(Sort.Direction.DESC, "start"));
+
+        List<Booking> bookings = bookingRepository.findAllByBookerId(userId, pageable);
 
         return filterBookingsByState(st, bookings).stream()
                 .map(BookingMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-
-    public Collection<BookingOutputDto> getAllBookingByOwnerIdAndState(Long userId, String state)
-            throws ExceptionInteralServerError {
+    public Collection<BookingOutputDto> getAllBookingByOwnerIdAndState(Long userId, String state, Integer from,
+                                                                       Integer size)
+            throws ExceptionInteralServerError, ValidationException {
 
         State st = getState(state);
 
@@ -105,11 +116,26 @@ public class BookingService {
             throw new ExceptionInteralServerError("wrong user");
         }
 
-        List<Booking> bookings = bookingRepository.findBookingByItem_User_IdOrderByStartDesc(userId);
+        validateFromAndSize(from, size);
+        Pageable pageable = PageRequest.of(
+                Objects.requireNonNullElse(from, 0),
+                Objects.requireNonNullElse(size, Integer.MAX_VALUE),
+                Sort.by("start").descending());
+
+        List<Booking> bookings = bookingRepository.findBookingByItem_User_IdOrderByStartDesc(userId, pageable);
 
         return filterBookingsByState(st, bookings).stream()
                 .map(BookingMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    private void validateFromAndSize(Integer from, Integer size) throws ValidationException {
+        if (Objects.requireNonNullElse(from, 0) < 0) {
+            throw new ValidationException(String.format("incorrect from=%d", from));
+        }
+        if (Objects.requireNonNullElse(size, 0) < 0) {
+            throw new ValidationException(String.format("incorrect size=%d", size));
+        }
     }
 
     private State getState(String st) throws ExceptionInteralServerError {

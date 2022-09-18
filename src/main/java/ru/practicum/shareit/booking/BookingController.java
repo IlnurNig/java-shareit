@@ -53,17 +53,23 @@ public class BookingController {
     @GetMapping
     public Collection<BookingOutputDto> getAllBookingByUserIdAndState(
             @RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
-            @RequestParam(defaultValue = "ALL") String state) throws ExceptionInteralServerError {
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(name = "from", required = false) Integer from,
+            @RequestParam(name = "size", required = false) Integer size)
+            throws ExceptionInteralServerError, ExceptionBadRequest {
 
-        return bookingService.getAllBookingByUserIdAndState(userId, state);
+        return bookingService.getAllBookingByUserIdAndState(userId, state, from, size);
     }
 
     @GetMapping("owner")
     public Collection<BookingOutputDto> getAllBookingByOwnerIdAndState(
             @RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
-            @RequestParam(defaultValue = "ALL") String state) throws ExceptionInteralServerError {
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(name = "from", required = false) Integer from,
+            @RequestParam(name = "size", required = false) Integer size)
+            throws ExceptionInteralServerError, ValidationException {
 
-        return bookingService.getAllBookingByOwnerIdAndState(userId, state);
+        return bookingService.getAllBookingByOwnerIdAndState(userId, state, from, size);
     }
 
 }
