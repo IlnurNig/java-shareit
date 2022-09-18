@@ -32,7 +32,6 @@ public class UserServiceTest {
         UserDto userCheck = userService.createUser(userDto);
         assertEquals(userDto.getName(), userCheck.getName());
         assertEquals(userDto.getEmail(), userCheck.getEmail());
-        assertEquals(1, userCheck.getId());
 
         userDto = UserDto.builder()
                 .name("user")
@@ -41,7 +40,6 @@ public class UserServiceTest {
         userCheck = userService.createUser(userDto);
         assertEquals(userDto.getName(), userCheck.getName());
         assertEquals(userDto.getEmail(), userCheck.getEmail());
-        assertEquals(2, userCheck.getId());
 
         UserDto finalUserDto = userDto;
         assertThrows(DataIntegrityViolationException.class, () -> userService.createUser(finalUserDto));
@@ -49,12 +47,6 @@ public class UserServiceTest {
         assertThrows(ExceptionNotFound.class, () -> userService.getUserDtoById(100));
         assertThrows(ExceptionNotFound.class, () -> userService.getUserDtoById(-1));
 
-        userDto = UserDto.builder()
-                .id(1)
-                .name("testName")
-                .email("test@test")
-                .build();
-        assertEquals(userDto, userService.getUserDtoById(1));
 
         userDto = userService.getUserDtoById(1);
         userDto.setName("updateName");

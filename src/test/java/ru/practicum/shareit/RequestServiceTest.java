@@ -15,7 +15,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
 import ru.practicum.shareit.requests.service.RequestService;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
@@ -35,9 +34,7 @@ public class RequestServiceTest {
     ItemService itemService;
 
     @Test
-    void requestServiceTest() throws ExceptionBadRequest, ExceptionConflict, ExceptionNotFound {
-        userService.createUser(UserDto.builder().name("test1").email("test@maeil").build());
-        userService.createUser(UserDto.builder().name("test2").email("boker@mail").build());
+    void requestServiceTest() throws ExceptionBadRequest, ExceptionNotFound {
         itemService.createItem(ItemDto.builder().name("item1").description("desc1").available(true).build(), 1);
 
         BookingDto bookingDto = BookingDto.builder()
