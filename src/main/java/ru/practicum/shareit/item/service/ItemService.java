@@ -24,5 +24,5 @@ public interface ItemService {
 
     Item getItemById(long itemId) throws UnknownItemException;
 
-     CommentDto createComment(Long userId, CommentDto commentDto, Long itemId) throws ExceptionNotFound, ExceptionBadRequest;
+    CommentDto createComment(Long userId, CommentDto commentDto, Long itemId) throws ExceptionNotFound, ExceptionBadRequest;
 }

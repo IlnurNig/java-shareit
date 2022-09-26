@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.context.annotation.Lazy;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.comment.Comment;
@@ -15,9 +17,9 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@RequiredArgsConstructor
-@AllArgsConstructor
-@Builder
+//@RequiredArgsConstructor
+//@AllArgsConstructor
+//@Builder
 @Entity
 @Table(name = "items")
 public class Item {
@@ -26,9 +28,9 @@ public class Item {
     @Column(name = "item_id")
     private long itemId;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id", nullable = false)
-    @ToString.Exclude
+//    @ToString.Exclude
     private User user;
 
     private String name;
@@ -38,7 +40,7 @@ public class Item {
     private Boolean available;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE, mappedBy = "item")
-    @ToString.Exclude
+//    @ToString.Exclude
     private Set<Booking> bookings;
 
     @Transient

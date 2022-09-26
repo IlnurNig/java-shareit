@@ -1,6 +1,8 @@
 package ru.practicum.shareit.user.model;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import ru.practicum.shareit.item.model.Item;
 
 import javax.persistence.*;
@@ -15,7 +17,7 @@ import java.util.Set;
 @Table(name = "users")
 @Getter
 @Setter
-@ToString
+//@ToString
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +30,7 @@ public class User {
     @Column(name = "email")
     private String email;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE, mappedBy = "user")
     @ToString.Exclude
     private Set<Item> items;
 }

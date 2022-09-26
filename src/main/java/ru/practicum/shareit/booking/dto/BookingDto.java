@@ -2,14 +2,14 @@ package ru.practicum.shareit.booking.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 /**
  * // TODO .
  */
-@Data
+@Getter
 @Builder
 public class BookingDto {
     private long id;
