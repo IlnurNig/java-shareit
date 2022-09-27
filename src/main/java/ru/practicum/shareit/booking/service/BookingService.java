@@ -139,11 +139,9 @@ public class BookingService {
 
     private void validateFromAndSize(Integer from, Integer size) throws ValidationException {
         if (Objects.requireNonNullElse(from, 0) < 0) {
-            log.info("incorrect from={}", from);
             throw new ValidationException(String.format("incorrect from=%d", from));
         }
         if (Objects.requireNonNullElse(size, 0) < 0) {
-            log.info("incorrect size={}", size);
             throw new ValidationException(String.format("incorrect size=%d", size));
         }
     }

@@ -50,26 +50,27 @@ public class RequestService {
     public ItemRequestDto getRequestDtoById(Long userId, long requestId) throws ExceptionNotFound {
         User user = userService.getUserById(userId);
         try {
+            log.info("getRequestDtoById {}", requestId);
             return ItemRequestMapper.toDto(getRequestById(requestId));
         } catch (EntityNotFoundException e) {
-            log.info("The Request with id={} does not exist", requestId);
             throw new UnknownItemException(String.format("The Request with id=%d does not exist", requestId));
         }
 
     }
 
     public ItemRequest getRequestById(long requestId) {
+        log.info("getRequestById {}", requestId);
         return requestRepository.getReferenceById(requestId);
     }
 
     public Collection<ItemRequestDto> getAllRequestByUserId(long userId) throws ExceptionNotFound {
         User user = userService.getUserById(userId);
+        log.info("getAllRequestByUserId {}", userId);
         return ItemRequestMapper.toDto(requestRepository.findAlLByRequester_IdOrderByCreatedDesc(userId));
     }
 
     private void validateCreateRequest(ItemRequestDto itemRequestDto) throws ExceptionBadRequest {
         if (!StringUtils.hasText(itemRequestDto.getDescription())) {
-            log.info("Add empty description failed");
             throw new ValidationException("Add empty description failed");
         }
     }
@@ -82,6 +83,7 @@ public class RequestService {
                 Objects.requireNonNullElse(from, 0),
                 Objects.requireNonNullElse(size, Integer.MAX_VALUE),
                 Sort.by("created").descending());
+        log.info("getAllRequest userId:{}, from:{}, size:{}", userId, from, size);
         return requestRepository.findAll(pageable).stream()
                 .filter(a -> a.getRequester().getId() != userId)
                 .map(ItemRequestMapper::toDto)
@@ -90,11 +92,9 @@ public class RequestService {
 
     private void validateFromAndSize(Integer from, Integer size) throws ValidationException {
         if (Objects.requireNonNullElse(from, 0) < 0) {
-            log.info("incorrect from={}", from);
             throw new ValidationException(String.format("incorrect from=%d", from));
         }
         if (Objects.requireNonNullElse(size, 0) < 0) {
-            log.info("incorrect size={}", size);
             throw new ValidationException(String.format("incorrect size=%d", size));
         }
     }
