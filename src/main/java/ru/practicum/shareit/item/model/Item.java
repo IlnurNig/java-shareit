@@ -17,9 +17,6 @@ import java.util.Set;
  */
 @Getter
 @Setter
-//@RequiredArgsConstructor
-//@AllArgsConstructor
-//@Builder
 @Entity
 @Table(name = "items")
 public class Item {
@@ -30,7 +27,6 @@ public class Item {
 
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id", nullable = false)
-//    @ToString.Exclude
     private User user;
 
     private String name;
@@ -40,7 +36,6 @@ public class Item {
     private Boolean available;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE, mappedBy = "item")
-//    @ToString.Exclude
     private Set<Booking> bookings;
 
     @Transient

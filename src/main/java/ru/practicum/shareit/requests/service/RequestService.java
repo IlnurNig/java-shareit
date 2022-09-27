@@ -52,6 +52,7 @@ public class RequestService {
         try {
             return ItemRequestMapper.toDto(getRequestById(requestId));
         } catch (EntityNotFoundException e) {
+            log.info("The Request with id={} does not exist", requestId);
             throw new UnknownItemException(String.format("The Request with id=%d does not exist", requestId));
         }
 
@@ -68,7 +69,8 @@ public class RequestService {
 
     private void validateCreateRequest(ItemRequestDto itemRequestDto) throws ExceptionBadRequest {
         if (!StringUtils.hasText(itemRequestDto.getDescription())) {
-            throw new ValidationException("Add empty descriptio failed");
+            log.info("Add empty description failed");
+            throw new ValidationException("Add empty description failed");
         }
     }
 
@@ -88,9 +90,11 @@ public class RequestService {
 
     private void validateFromAndSize(Integer from, Integer size) throws ValidationException {
         if (Objects.requireNonNullElse(from, 0) < 0) {
+            log.info("incorrect from={}", from);
             throw new ValidationException(String.format("incorrect from=%d", from));
         }
         if (Objects.requireNonNullElse(size, 0) < 0) {
+            log.info("incorrect size={}", size);
             throw new ValidationException(String.format("incorrect size=%d", size));
         }
     }

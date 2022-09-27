@@ -34,7 +34,9 @@ public class ItemMapper {
     }
 
     public static Set<ItemDto> toDto(Set<Item> items) {
-        if (items == null) return null;
+        if (items == null) {
+            return null;
+        }
         return items.stream().map(ItemMapper::toDto).collect(Collectors.toSet());
     }
 

@@ -55,6 +55,7 @@ public class BookingService {
         booking.setBooker(booker);
         booking.setItem(item);
         booking.setStatus(Status.WAITING);
+        log.info("createBooking {}", booking);
         return BookingMapper.toDto(bookingRepository.save(booking));
     }
 
@@ -73,6 +74,7 @@ public class BookingService {
         } else {
             booking.setStatus(Status.REJECTED);
         }
+        log.info("approveBooking {}", booking);
         return BookingMapper.toDto(bookingRepository.save(booking));
     }
 
@@ -83,6 +85,7 @@ public class BookingService {
         if (userId != booking.getBooker().getId() && userId != booking.getItem().getUser().getId()) {
             throw new UnknownUserException(String.format("user with id=%d has no access rights", userId));
         }
+        log.info("getBookingByBookingIdAndUserId {}", booking);
         return BookingMapper.toDto(booking);
     }
 
@@ -104,6 +107,7 @@ public class BookingService {
 
         List<Booking> bookings = bookingRepository.findAllByBookerId(userId, pageable);
 
+        log.info("getAllBookingByUserIdAndState {}", bookings);
         return filterBookingsByState(st, bookings).stream()
                 .map(BookingMapper::toDto)
                 .collect(Collectors.toList());
@@ -127,6 +131,7 @@ public class BookingService {
 
         List<Booking> bookings = bookingRepository.findBookingByItem_User_IdOrderByStartDesc(userId, pageable);
 
+        log.info("getAllBookingByUserIdAndState {}", bookings);
         return filterBookingsByState(st, bookings).stream()
                 .map(BookingMapper::toDto)
                 .collect(Collectors.toList());
@@ -134,9 +139,11 @@ public class BookingService {
 
     private void validateFromAndSize(Integer from, Integer size) throws ValidationException {
         if (Objects.requireNonNullElse(from, 0) < 0) {
+            log.info("incorrect from={}", from);
             throw new ValidationException(String.format("incorrect from=%d", from));
         }
         if (Objects.requireNonNullElse(size, 0) < 0) {
+            log.info("incorrect size={}", size);
             throw new ValidationException(String.format("incorrect size=%d", size));
         }
     }
