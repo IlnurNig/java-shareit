@@ -19,6 +19,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.requests.model.ItemRequest;
+import ru.practicum.shareit.requests.service.RequestService;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -35,14 +37,16 @@ public class ItemServiceIml implements ItemService {
     private final ItemRepository itemRepository;
     private final UserService userService;
     private final CommentRepository commentRepository;
+    private final RequestService requestService;
 
     @Autowired
     public ItemServiceIml(ItemRepository itemRepository,
                           UserService userService,
-                          CommentRepository commentRepository) {
+                          CommentRepository commentRepository, RequestService requestService) {
         this.itemRepository = itemRepository;
         this.userService = userService;
         this.commentRepository = commentRepository;
+        this.requestService = requestService;
     }
 
     @Override
@@ -50,6 +54,10 @@ public class ItemServiceIml implements ItemService {
         Item item = ItemMapper.toEntity(itemDto);
         validateCreateItem(item, userId);
         User user = UserMapper.toEntity(userService.getUserDtoById(userId));
+        if (itemDto.getRequestId() > 0) {
+            ItemRequest itemRequest = requestService.getRequestById(itemDto.getRequestId());
+            item.setItemRequest(itemRequest);
+        }
         item.setUser(user);
         return ItemMapper.toDto(itemRepository.save(item));
     }

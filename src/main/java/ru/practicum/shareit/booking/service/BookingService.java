@@ -2,17 +2,23 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingOutputDto;
 import ru.practicum.shareit.booking.dto.State;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.repository.BookingRepository;
 import ru.practicum.shareit.booking.model.status.Status;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.abstractClass.ExceptionBadRequest;
 import ru.practicum.shareit.exception.abstractClass.ExceptionNotFound;
-import ru.practicum.shareit.exception.iml.*;
+import ru.practicum.shareit.exception.iml.ExceptionInteralServerError;
+import ru.practicum.shareit.exception.iml.UnknownBookingException;
+import ru.practicum.shareit.exception.iml.UnknownUserException;
+import ru.practicum.shareit.exception.iml.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.User;
@@ -21,6 +27,7 @@ import ru.practicum.shareit.user.service.UserService;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +55,7 @@ public class BookingService {
         booking.setBooker(booker);
         booking.setItem(item);
         booking.setStatus(Status.WAITING);
+        log.info("createBooking {}", booking);
         return BookingMapper.toDto(bookingRepository.save(booking));
     }
 
@@ -66,6 +74,7 @@ public class BookingService {
         } else {
             booking.setStatus(Status.REJECTED);
         }
+        log.info("approveBooking {}", booking);
         return BookingMapper.toDto(bookingRepository.save(booking));
     }
 
@@ -76,11 +85,13 @@ public class BookingService {
         if (userId != booking.getBooker().getId() && userId != booking.getItem().getUser().getId()) {
             throw new UnknownUserException(String.format("user with id=%d has no access rights", userId));
         }
+        log.info("getBookingByBookingIdAndUserId {}", booking);
         return BookingMapper.toDto(booking);
     }
 
-    public Collection<BookingOutputDto> getAllBookingByUserIdAndState(Long userId, String state)
-            throws ExceptionInteralServerError {
+    public Collection<BookingOutputDto> getAllBookingByUserIdAndState(Long userId, String state, Integer from,
+                                                                      Integer size)
+            throws ExceptionInteralServerError, ExceptionBadRequest {
 
         State st = getState(state);
 
@@ -88,16 +99,23 @@ public class BookingService {
             throw new ExceptionInteralServerError("wrong user");
         }
 
-        List<Booking> bookings = bookingRepository.findBookingByBookerIdOrderByStartDesc(userId);
+        validateFromAndSize(from, size);
+        Pageable pageable = PageRequest.of(
+                Objects.requireNonNullElse(from, 0) / Objects.requireNonNullElse(size, 50),
+                Objects.requireNonNullElse(size, 50),
+                Sort.by(Sort.Direction.DESC, "start"));
 
+        List<Booking> bookings = bookingRepository.findAllByBookerId(userId, pageable);
+
+        log.info("getAllBookingByUserIdAndState {}", bookings);
         return filterBookingsByState(st, bookings).stream()
                 .map(BookingMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-
-    public Collection<BookingOutputDto> getAllBookingByOwnerIdAndState(Long userId, String state)
-            throws ExceptionInteralServerError {
+    public Collection<BookingOutputDto> getAllBookingByOwnerIdAndState(Long userId, String state, Integer from,
+                                                                       Integer size)
+            throws ExceptionInteralServerError, ValidationException {
 
         State st = getState(state);
 
@@ -105,11 +123,27 @@ public class BookingService {
             throw new ExceptionInteralServerError("wrong user");
         }
 
-        List<Booking> bookings = bookingRepository.findBookingByItem_User_IdOrderByStartDesc(userId);
+        validateFromAndSize(from, size);
+        Pageable pageable = PageRequest.of(
+                Objects.requireNonNullElse(from, 0),
+                Objects.requireNonNullElse(size, Integer.MAX_VALUE),
+                Sort.by("start").descending());
 
+        List<Booking> bookings = bookingRepository.findBookingByItem_User_IdOrderByStartDesc(userId, pageable);
+
+        log.info("getAllBookingByUserIdAndState {}", bookings);
         return filterBookingsByState(st, bookings).stream()
                 .map(BookingMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    private void validateFromAndSize(Integer from, Integer size) throws ValidationException {
+        if (Objects.requireNonNullElse(from, 0) < 0) {
+            throw new ValidationException(String.format("incorrect from=%d", from));
+        }
+        if (Objects.requireNonNullElse(size, 0) < 0) {
+            throw new ValidationException(String.format("incorrect size=%d", size));
+        }
     }
 
     private State getState(String st) throws ExceptionInteralServerError {

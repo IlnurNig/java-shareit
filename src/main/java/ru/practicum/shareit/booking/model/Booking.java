@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "bookings")
 @Getter
 @Setter
-@ToString
+//@ToString
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +30,8 @@ public class Booking {
     @Column(name = "end_time")
     private LocalDateTime end;
 
-    @ManyToOne()
-    @JoinColumn(name = "item_id")
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)

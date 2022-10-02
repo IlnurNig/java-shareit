@@ -4,11 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import ru.practicum.shareit.exception.abstractClass.ExceptionBadRequest;
+import ru.practicum.shareit.exception.abstractClass.ExceptionNotFound;
 import ru.practicum.shareit.exception.iml.ConflictUserException;
 import ru.practicum.shareit.exception.iml.UnknownUserException;
 import ru.practicum.shareit.exception.iml.ValidationException;
-import ru.practicum.shareit.exception.abstractClass.ExceptionBadRequest;
-import ru.practicum.shareit.exception.abstractClass.ExceptionNotFound;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -23,7 +23,7 @@ public class UserServiceIml implements UserService {
     private final UserRepository repository;
 
     @Autowired
-    public UserServiceIml(UserRepository repository, UserMapper mapper) {
+    public UserServiceIml(UserRepository repository) {
         this.repository = repository;
     }
 
