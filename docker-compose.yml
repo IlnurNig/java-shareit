@@ -21,15 +21,17 @@ services:
       - db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
-      - SPRING_DATASOURCE_USERNAME=test
-      - SPRING_DATASOURCE_PASSWORD=test
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_SQL_INIT_MODE=always
       - SPRING_JPA_HIBERNATE_DDL-AUTO=none
 
   db:
     image: postgres:14.5-alpine
-    container_name: postgres
+    container_name: test
     ports:
-      - "6541:5432"
+      - "6530:5432"
     environment:
-      - POSTGRES_PASSWORD=test
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=root
+      - POSTGRES_DB=shareit
