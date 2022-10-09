@@ -51,7 +51,7 @@ public class Item {
     private Set<Comment> comments;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    @JoinColumn(name = "request_id", nullable = true)
+    @JoinColumn(name = "request_id")
     @ToString.Exclude
     private ItemRequest itemRequest;
 }
