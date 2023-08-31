@@ -40,4 +40,6 @@ public class Booking {
     private User booker;
 
     private Status status;
+
+    //test
 }
